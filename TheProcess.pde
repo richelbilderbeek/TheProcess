@@ -8,7 +8,7 @@ ArrayList<Laser> lasers = new ArrayList<Laser>();
 boolean paused = false;
 
 void setup(){
-  playerImg = loadImage("Player.png");
+  playerImg = loadImage("Graphics/Player.png");
   
   fullScreen(P2D);
   noCursor();

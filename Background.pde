@@ -1,6 +1,7 @@
 class Star {
   PVector position = new PVector();
   float velocity;
+  float zFactor;
   float diameter;
   color tint;
   
@@ -8,6 +9,7 @@ class Star {
     position.x = random(width);
     position.y = random(height);
     position.z = random(0.0, 1.0);
+    zFactor = pow(1.23 - position.z, 5.0);
     
     diameter = 5 / (position.z + 2);
     tint = color(random(192, 255),
@@ -17,7 +19,7 @@ class Star {
   }
   
   void update(){
-    velocity = (4.2 - (3.0 * player.position.y / height)) * (1.5 - position.z);
+    velocity = (4.2 - (3.0 * player.position.y / height)) * zFactor;
     position.y += velocity;
     position.y %= height;
   }
