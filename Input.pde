@@ -20,12 +20,15 @@ void processInput(){
   PVector playerDirection = new PVector();
   for (int k = 0; k < pressedKeys.size(); ++k){
     switch (pressedKeys.get(k)){
-      case 'l': player.fire(); break;
+      case '9': saveFrame();
+      case 'l': player.fire(); break; //L is voor laser
       case 'w': { playerDirection.add( 0.0f, -1.0f); } break;
       case 'a': { playerDirection.add(-1.0f,  0.0f); } break;
       case 's': { playerDirection.add( 0.0f,  1.0f); } break;
       case 'd': { playerDirection.add( 1.0f,  0.0f); } break;  
     }
   }
-  player.velocity = player.velocity.mult(9).add( playerDirection.normalize().mult(10).add(new PVector(0, 1)) ).mult(0.1f); //Bah! Met met vectoren rekenen zou in mijn ogen gewoon met +, - en * moeten kunnen; tegenvaller.
+  player.velocity = player.velocity.mult(9).add(playerDirection.normalize().mult(500).add(
+                          new PVector(0, 42 * (1 - (player.position.y / height)) )) ).mult(0.1f);
+                          //Met met vectoren rekenen zou in mijn ogen gewoon met +, - en * moeten kunnen; valt me een beetje tegen van Processing.
 }
