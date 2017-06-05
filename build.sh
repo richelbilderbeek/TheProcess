@@ -1,12 +1,14 @@
 #!/bin/bash
 # Checks if the code can be compiled
 
-
-
 myexe="./processing-3.3.4/processing-java"
-sketch_name=`ls *.pde | cut -d '.' -f 1`
+sketch_name="TheProcess"
 input_folder="../"$sketch_name
 output_folder=$input_folder"_output"
+
+echo "sketch_name: "$sketch_name
+echo "input_folder: "$input_folder
+echo "output_folder: "$output_folder
 
 if [ ! -e $myexe ]
 then
