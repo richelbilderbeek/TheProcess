@@ -1,4 +1,7 @@
 #!/bin/bash
+# Downloads and unpacks Processing
+
+# Pick either 32 or 64 bit
 #zipfile="processing-3.0.2-linux64.tgz"
 zipfile="processing-3.0.2-linux32.tgz"
 
