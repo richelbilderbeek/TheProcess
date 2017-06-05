@@ -1,4 +1,4 @@
-class HealthPack{
+class HealthPack {
   int size = 32;
   PVector position = new PVector();
   
@@ -6,25 +6,28 @@ class HealthPack{
   {
     position = pos;
   }
+  
   void update()
   {
-    position.add(new PVector(0, tick * (55 + (height - player.position.y) * 0.5)));
+    position.add(new PVector(0, tick * (-435 + ((height - player.position.y) / height) * 400)));
   }
-  
-  boolean hitPlayer()
-  {
-    if (player.position.dist(position) < size / 2 + player.radius)
-      return true;
-    else
-      return false;
-  }
-  
   
   void display()
   {
-    fill(0, 0, 255);
-    stroke(0, 255, 255, 128);
-    strokeWeight(random(2, 3));
+    //Teken cirkel
+    float intoSequence = (millis % 1000) * 0.001;
+    float diameter = intoSequence * size * 4;
+    noFill();
+    stroke(0, 255, 255, 255 - 255 * intoSequence);
+    strokeWeight(2.0);
+    
+    ellipse(position.x, position.y, diameter, diameter);
+    
+    //Teken kruis als één vorm
+    float alpha = 255 * pow(sin(millis * 0.005), 4);
+    fill(0, 0, 255, 255 - alpha / 2);
+    stroke(0, 255, 255, 64 + 2 * alpha / 3);
+    strokeWeight(random(2.0, 3.0));
 
     beginShape();
     for (float r = 0; r < TWO_PI; r += HALF_PI) {
@@ -46,5 +49,13 @@ class HealthPack{
       }
     }
     endShape(CLOSE);
+  }
+  
+  boolean hitPlayer()
+  {
+    if (playerLives() && player.position.dist(position) < (size * 2) / 2 + player.radius)
+      return true;
+    else
+      return false;
   }
 }

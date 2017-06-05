@@ -1,11 +1,10 @@
 class Star {
   PVector position = new PVector();
-  float speed;
-  float zFactor;
-  float diameter;
+  float speed, zFactor, diameter, sizeMultiplier;
   color tint;
   
-  Star(){
+  Star()
+  {
     position.x = random(width);
     position.y = random(height);
     position.z = random(0.0, 1.0);
@@ -18,21 +17,31 @@ class Star {
                  192 / (2 * position.z + 1));
   }
   
-  void update(){
+  void update()
+  {
     speed = (425.0 - (235.0 * player.position.y / height)) * zFactor;
-    position.y += tickify(speed);
+    position.y += tick * speed;
     position.y %= height;
   }
   
-  void display(){
-    float sizeMultiplier = min(max((millis() - 2358) / 5000.0, 0), 1);
-    //float starWidth = max((sizeMultiplier * diameter) / max(velocity * 0.023, 1.0), 1.0);
+  void display()
+  {
+    sizeMultiplier = min(max((millis() - 2358) / 5000.0, 0), 1);
     float starHeight = sizeMultiplier * diameter + speed * speed * 0.000042;
-    stroke(tint);
+    stroke(tint, 255 * sizeMultiplier);
     strokeWeight(1);
     line(position.x,
          position.y,
          position.x,
          position.y + starHeight);
+  }
+  
+  void drawClouds()
+  {
+    if (sizeMultiplier < 1 && zFactor > 1.0) {
+      fill(224, 224, 224, position.y * 0.1 - 128 * sizeMultiplier * zFactor);
+      noStroke();
+      ellipse(width - position.x, position.y + height / 4, zFactor * width * 0.1, zFactor * width * 0.025);
+    }
   }
 }

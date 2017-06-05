@@ -2,9 +2,6 @@ float tick;
 int millis;
 
 Ship player;
-PImage playerImg;
-
-HealthPack healthPack;
 
 Star[] starField = new Star[666];
 IntList pressedKeys = new IntList();
@@ -23,14 +20,12 @@ void setup()
   noCursor();
   frameRate(60);
   
-  playerImg = loadImage("Graphics/Player.png");
-  player = new Ship(playerImg);
+  player = new Ship();
   player.reset();
   
   for (int s = 0; s < starField.length; ++s) {
     starField[s] = new Star();
   }
-  
   
   for (int p = 0; p < 5; ++p) {
     pentagons.add(new Pentagon(new PVector(random(width), -random(2, 3) * height)));
@@ -42,10 +37,11 @@ void draw()
   tick = paused ? 0.0 : (millis() - millis) * 0.001;
   millis = millis();
   
+  //HealthPack toevoegen
   if (millis > 2000 && healthPacks.size() == 0
    && player.health.norm < 0.5
    && playerLives()) {
-    healthPacks.add(new HealthPack(new PVector(random(width), -512)));
+    healthPacks.add(new HealthPack(new PVector(random(width), height+512)));
   }
   
   //Verlaat de atmosfeer
@@ -80,18 +76,25 @@ void draw()
       pentagon.display();
     }
   }
+  //Maak nieuwe pentagons aan
   sincePentagonSpawn += tick;
-  if (sincePentagonSpawn > pentagonInterval && pentagons.size() < maxPentagons) {
+  int activePentagons = 0;
+  for (int p = 0; p < pentagons.size(); ++p) {
+    if (!pentagons.get(p).health.isZero())
+      ++activePentagons;
+  }
+  if (sincePentagonSpawn > pentagonInterval && activePentagons < maxPentagons) {
     sincePentagonSpawn = 0.0;
+    pentagonInterval = random(max(0.5, 50000 / millis * 5 - pentagons.size()));
     pentagons.add(new Pentagon(new PVector(random(width), -random(1, 2) * height)));
   }
   
-  //Ververs health pack
+  //Ververs HealthPack
   for (int h = 0; h < healthPacks.size(); ++h) {
     HealthPack healthPack = healthPacks.get(h);
     healthPack.update();
     healthPack.display();
-    if (healthPack.position.y > height + 32)
+    if (healthPack.position.y < -32)
       healthPacks.remove(h);
     else if (healthPack.hitPlayer()) {
       healthPacks.remove(h);
@@ -99,18 +102,38 @@ void draw()
     }
   }
   
+  //Teken wolken
+  for (int s = 0; s < starField.length; ++s) {
+    
+    starField[s].drawClouds();
+  }
+  
   processInput();
 }
 
-PVector tickify(PVector vec)
-{
-  return new PVector(vec.x * tick, vec.y * tick);
-}
-float tickify(float val)
-{
-  return val * tick;
-}
 boolean playerLives()
 {
   return !player.health.isZero();
+}
+
+void drawFlash(PVector pos, color col)
+{
+      blendMode(ADD);
+      //stroke(col);
+      //strokeWeight(5);
+      fill(col);
+      noStroke();
+        //Flits tekenen
+      float angle = TWO_PI / 10;
+      for (int f = 0; f < 2; ++f) {
+        float rotation = random(TWO_PI);
+        beginShape();
+        for (float a = 0; a < TWO_PI; a += angle) {
+          float px = pos.x + cos(a + rotation) * (a % (angle * 2) == 0 ? random(23 - f * 10, 34 - f * 11) : 5);
+          float py = pos.y + sin(a + rotation) * (a % (angle * 2) == 0 ? random(23 - f * 10, 34 - f * 11) : 5);
+          vertex(px, py);
+        }
+        endShape(CLOSE);
+      }
+      blendMode(BLEND);
 }

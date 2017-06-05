@@ -1,5 +1,5 @@
 class Ship {
-  PImage image;
+  PShape image = loadShape("Graphics/Player.svg");
   PVector position, velocity, size;
   float radius;
   
@@ -10,8 +10,8 @@ class Ship {
   Health health = new Health(10.0);
   Score score = new Score();
   
-  Ship(PImage shipImage) {
-    image = shipImage;
+  //Aanmaken van het schip
+  Ship() {
     velocity = new PVector();
     size = new PVector(image.width, image.height);
     radius = size.x / 2 - 5;
@@ -21,15 +21,19 @@ class Ship {
   {
     position = new PVector(width / 2, height / 2);
     velocity.mult(0);
+    health.resetHealth();
   }
   
   void update()
   {
-    position.add(tickify(velocity));
-    if (position.x < - 0.5 * image.width) { position.x += width; }
-    else if (position.x > width + 0.5 * image.width) { position.x -= width; }
-    //position.x = constrain(position.x, size.x, width - size.x);
-    position.y = constrain(position.y, size.y, height - size.y);
+    //Verplaats schip
+    position.add(velocity.copy().mult(tick));
+    if (position.x < - 0.5 * image.width) {
+      position.x += width;
+    } else if (position.x > width + 0.5 * image.width) {
+      position.x -= width;
+    }
+    position.y = constrain(position.y, playerLives() ? size.y : height - size.y, height - size.y);
     
     //Lasers bijwerken
     for (int l = 0; l < lasers.size(); ++l) {
@@ -37,6 +41,7 @@ class Ship {
       if (laser.position.y < 0)
         lasers.remove(l);
       else {
+        //Kijk of deze laser met een pentagon botst
         for (int p = 0; p < pentagons.size(); ++p) {
           Pentagon pentagon = pentagons.get(p);
           if (laser.hitPentagon(pentagon) && !pentagon.health.isZero()) {
@@ -45,6 +50,7 @@ class Ship {
             if (pentagon.health.isZero()) {
               score.addScore(5);
             }
+            break;
           }
         }
         laser.update();
@@ -54,14 +60,19 @@ class Ship {
   
   void display()
   {
-    strokeWeight(2);
     //Teken lasers
+    strokeWeight(2);
     for (int l = 0; l < lasers.size(); ++l) {
       Laser laser = lasers.get(l);
       laser.display();
     }
+    //Teken score
+    score.display();
     if (health.isZero())
       return;
+      
+    //Teken levensbalk
+    health.display();
       
     //Teken vlam
     blendMode(ADD);
@@ -76,15 +87,13 @@ class Ship {
     //Teken schip
     blendMode(BLEND);
     for (int i = -1; i <= 1; ++i){
-      image(image,
+      shape(image,
             position.x - image.width / 2 + i * width,
             position.y - image.height / 2);
     }
-    //Teken levensbalk en score
-    health.display();
-    score.display();
   }
   
+  //Schiet lasers
   void fire()
   {
     if (millis > lastShot + shotInterval){ 
@@ -104,19 +113,12 @@ class Laser {
   {
     size = new PVector(5, 32);
     position = new PVector(pos.x, pos.y);
-    velocity = new PVector(0, -42);
+    velocity = new PVector(0, -2350);
   }
   
   void update()
   {
-    position.add(velocity);
-  }
-  boolean hitPentagon(Pentagon pentagon)
-  {
-    if (pentagon.position.dist(position) < size.x + pentagon.radius)
-      return true;
-    else
-      return false;
+    position.add(velocity.copy().mult(tick));
   }
   
   void display()
@@ -131,6 +133,18 @@ class Laser {
     for (int i = -1; i <= 1; ++i) {
       ellipse(position.x + i * width, position.y,
               size.x, size.y * 2);
+    }
+  }
+  
+  boolean hitPentagon(Pentagon pentagon)
+  {
+    if (pentagon.position.dist(position) < size.x + pentagon.radius
+     && !pentagon.health.isZero())
+    {
+      drawFlash(position.copy(), color(64, 255, 32));
+      return true;
+    } else {
+      return false;
     }
   }
 }

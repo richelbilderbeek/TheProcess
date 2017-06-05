@@ -8,29 +8,6 @@ class Health {
     resetHealth();
   }
   
-  void setHealth(float health)
-  {
-    hp = constrain(health, 0.0, initial);
-    norm = hp / initial;
-  }
-  void resetHealth()
-  {
-    setHealth(initial);
-  }
-  void hit(float damage)
-  {
-    setHealth(hp - damage);
-  }
-  
-  boolean isFull()
-  {
-    return hp == initial;
-  }
-  boolean isZero()
-  {
-    return hp == 0.0;
-  }
-  
   void display()
   {
     fill(max(255 * (1.0 - norm * norm * norm), 0.0),
@@ -63,5 +40,31 @@ class Health {
     strokeWeight(1);
     barWidth = 50;
     rect(position.x - barWidth / 2, position.y, barWidth, 5);
+  }
+  
+  void setHealth(float health)
+  {
+    hp = constrain(health, 0.0, initial);
+    norm = hp / initial;
+  }
+  
+  void resetHealth()
+  {
+    setHealth(initial);
+  }
+  
+  void hit(float damage)
+  {
+    setHealth(hp - damage);
+  }
+  
+  boolean isFull()
+  {
+    return hp == initial;
+  }
+  
+  boolean isZero()
+  {
+    return hp == 0.0;
   }
 }

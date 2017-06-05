@@ -1,7 +1,10 @@
-void keyPressed(){
-  if (key == 'p') {
-    if (paused) loop();
-    else noLoop();
+void keyPressed()
+{
+  if (key == 'p' && playerLives()) {
+    if (paused)
+      loop();
+    else
+      noLoop();
     paused = !paused;
   }
   for (int k = 0; k < pressedKeys.size(); ++k){
@@ -9,14 +12,21 @@ void keyPressed(){
   }
   pressedKeys.append(key);
 }
-void keyReleased(){
+
+void keyReleased()
+{
   for (int k = 0; k < pressedKeys.size(); ++k){
     if (pressedKeys.get(k) == key){
       pressedKeys.remove(k);
     }
   }
 }
-void processInput(){
+
+void processInput()
+{
+  if (!playerLives())
+    return;
+    
   PVector playerDirection = new PVector();
   for (int k = 0; k < pressedKeys.size(); ++k){
     switch (pressedKeys.get(k)){
